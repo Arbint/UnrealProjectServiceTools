@@ -4,8 +4,8 @@ import shutil
 import subprocess
 
 class UnrealCleaner:
-    def __init__(self, unrealPrjDir: str):
-        self.unrealPrjDir = unrealPrjDir   
+    def __init__(self, unrealPrjDirFunc):
+        self.unrealPrjDirFunction = unrealPrjDirFunc  
         
     def GetUnrealDeleteNames(self):
         return ['.vs', 'Binaries', 'DerivedDataCache', 'Intermediate', 'Saved', '.vsconfig']
@@ -13,13 +13,13 @@ class UnrealCleaner:
     def GetAllPathsToDelete(self):
         filePaths = []
         for name in self.GetUnrealDeleteNames():
-            filePath = os.path.join(self.unrealPrjDir, name)
+            filePath = os.path.join(self.unrealPrjDirFunction(), name)
             if os.path.exists(filePath):
-                filePaths.append(filePath)
+                filePaths.append(os.path.normpath(filePath))
 
         slnPath = self.GetVisualStudioSolutionFilePath()
         if os.path.exists(slnPath):
-            filePaths.append(self.GetVisualStudioSolutionFilePath())
+            filePaths.append(os.path.normpath(slnPath))
 
         return filePaths
 
@@ -30,8 +30,8 @@ class UnrealCleaner:
         return self.GetFilePathWithExtention('.sln')
 
     def GetFilePathWithExtention(self, extention: str):
-        for fileName in os.listdir(self.unrealPrjDir):
-            filePath = os.path.join(self.unrealPrjDir, fileName)
+        for fileName in os.listdir(self.unrealPrjDirFunction()):
+            filePath = os.path.join(self.unrealPrjDirFunction(), fileName)
             if os.path.isfile(filePath) and extention in fileName:
                 return filePath
         return ""
@@ -56,9 +56,9 @@ class UnrealCleaner:
                 shutil.rmtree(file)
 
 class UnrealCleanerGUI(QWidget):
-    def __init__(self, unrealPrjDir : str):
+    def __init__(self, unrealPrjDirFunc):
         super().__init__()
-        self.unrealCleaner = UnrealCleaner(unrealPrjDir) 
+        self.unrealCleaner = UnrealCleaner(unrealPrjDirFunc) 
         self.masterLayout = QVBoxLayout()
         self.setLayout(self.masterLayout)
         self.label = QLabel("Project Cleaner")
