@@ -31,8 +31,24 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.projectPath)
 
         self.locationUnrealPrjBtn = QPushButton("...")
+        self.locationUnrealPrjBtn.setFixedWidth(50)
         layout.addWidget(self.locationUnrealPrjBtn)
         self.locationUnrealPrjBtn.clicked.connect(self.LocateUnrealProject)
+
+        openLayout = QHBoxLayout()
+        self.centralLayout.addLayout(openLayout)
+
+        openFolderBtn = QPushButton("Open Folder")
+        openLayout.addWidget(openFolderBtn)
+        openFolderBtn.clicked.connect(self.unreal.OpenUnrealProjectFolder)
+        
+        openEditorBtn = QPushButton("Open Editor")
+        openLayout.addWidget(openEditorBtn)
+        openEditorBtn.clicked.connect(self.unreal.OpenEditor)
+        
+        openSlnBtn = QPushButton("Open Visual Studio")
+        openLayout.addWidget(openSlnBtn)
+        openSlnBtn.clicked.connect(self.unreal.OpenVisualStudioSolution)
 
     def LocateUnrealProject(self):
         fileFilter = "Unreal Project File(*.uproject);;"

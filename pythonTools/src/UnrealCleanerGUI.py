@@ -11,27 +11,32 @@ class UnrealCleanerGUI(QWidget):
         self.masterLayout.addWidget(self.label)
         self.deleteFileDisplay = QListWidget()
         self.masterLayout.addWidget(self.deleteFileDisplay)
+
+        cleanStepsLayout= QHBoxLayout()
+        self.masterLayout.addLayout(cleanStepsLayout)
         self.analyzeBtn = QPushButton("Find")
-        self.masterLayout.addWidget(self.analyzeBtn)
-        self.analyzeBtn.clicked.connect(self.AnalyzeBtnClicked)
+        cleanStepsLayout.addWidget(self.analyzeBtn)
+        self.analyzeBtn.clicked.connect(self.UpdateDeleteItems)
         self.cleanBtn = QPushButton("Clean")
-        self.masterLayout.addWidget(self.cleanBtn)
+        cleanStepsLayout.addWidget(self.cleanBtn)
         self.cleanBtn.clicked.connect(self.CleanBtnClicked)
         self.regenBtn = QPushButton("Regenerate")
-        self.masterLayout.addWidget(self.regenBtn)
+        cleanStepsLayout.addWidget(self.regenBtn)
+
         self.regenBtn.clicked.connect(self.RegenBtnClicked)
         self.cleanAndRebuildBtn = QPushButton("Clean and Regenerate VS Project")
         self.masterLayout.addWidget(self.cleanAndRebuildBtn)
         self.cleanAndRebuildBtn.clicked.connect(self.CleanAndRebuild)
 
+        self.UpdateDeleteItems()        
+
     def RegenBtnClicked(self):
-        self.unrealCleaner.RegenerateVisualStuidoProjFile()
+        self.unrealCleaner.unreal.RegenerateVisualStuidoProjFile()
+        self.UpdateDeleteItems()
 
     def CleanAndRebuild(self):
         self.unrealCleaner.CleanProject()
-        self.unrealCleaner.RegenerateVisualStuidoProjFile()
-
-    def AnalyzeBtnClicked(self):
+        self.unrealCleaner.unreal.RegenerateVisualStuidoProjFile()
         self.UpdateDeleteItems()
 
     def UpdateDeleteItems(self):
@@ -40,3 +45,4 @@ class UnrealCleanerGUI(QWidget):
 
     def CleanBtnClicked(self):
         self.unrealCleaner.CleanProject()
+        self.UpdateDeleteItems()

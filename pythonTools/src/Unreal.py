@@ -3,7 +3,7 @@ import pickle
 import os
 import dirUtilities
 import shutil
-import subprocess
+import CLIUtilities
 
 class SaveUnrealConfig:
     def __init__(self, unrealDir):
@@ -34,6 +34,34 @@ class UnrealBase:
     def GetProjectDir(self):
         return self.unrealPrjDir
 
+    def OpenEditor(self):
+        command = f"{self.GetUnrealPrjFilePath()}"
+        CLIUtilities.RunCommand(command)
+
+    def OpenVisualStudioSolution(self):
+        command = f"{self.GetVisualStudioSolutionFilePath()}"
+        CLIUtilities.RunCommand(command)
+
+    def OpenUnrealProjectFolder(self):
+        if self.unrealPrjDir and os.path.exists(self.unrealPrjDir):
+            os.startfile(self.unrealPrjDir)
+
+    def GetUnrealPrjFilePath(self):
+        return dirUtilities.GetFilePathWithExtention(self.unrealPrjDir, '.uproject')
+
+    def GetEngineSelectorCmd(self):
+        return f"\"{self.GetEngineSelectorPath()}\""
+
+    def GetVisualStudioSolutionFilePath(self):
+        return dirUtilities.GetFilePathWithExtention(self.unrealPrjDir, '.sln')
+
+    def GetEngineSelectorPath(self):
+        return "C:\\Program Files (x86)\\Epic Games\\Launcher\\Engine\\Binaries\\Win64\\UnrealVersionSelector.exe"
+
+    def RegenerateVisualStuidoProjFile(self):
+        command = f"{self.GetEngineSelectorCmd()} /projectfiles " + self.GetUnrealPrjFilePath()        
+        CLIUtilities.RunCommand(command) 
+
 class UnrealCleaner:
     def __init__(self, unreal:UnrealBase):
         self.unreal = unreal  
@@ -48,36 +76,11 @@ class UnrealCleaner:
             if os.path.exists(filePath):
                 filePaths.append(os.path.normpath(filePath))
 
-        slnPath = self.GetVisualStudioSolutionFilePath()
+        slnPath = self.unreal.GetVisualStudioSolutionFilePath()
         if os.path.exists(slnPath):
             filePaths.append(os.path.normpath(slnPath))
 
         return filePaths
-
-    def GetUnrealPrjFilePath(self):
-        return self.GetFilePathWithExtention('.uproject')
-
-    def GetVisualStudioSolutionFilePath(self):
-        return self.GetFilePathWithExtention('.sln')
-
-    def GetFilePathWithExtention(self, extention: str):
-        for fileName in os.listdir(self.unreal.GetProjectDir()):
-            filePath = os.path.join(self.unreal.GetProjectDir(), fileName)
-            if os.path.isfile(filePath) and extention in fileName:
-                return filePath
-        return ""
-
-    def RegenerateVisualStuidoProjFile(self):
-        command = "\"C:\\Program Files (x86)\\Epic Games\\Launcher\\Engine\\Binaries\\Win64\\UnrealVersionSelector.exe\" /projectfiles " + self.GetUnrealPrjFilePath()        
-    
-        print("running: ")
-        print(command)
-        print("-----------------------------------")
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        print(f"Rebuilt Visual Studio Project with Return code: {result.returncode}\n Output: {result.stdout} \n")
-        if result.stderr:
-            print(f"Error: {result.stderr}")
-
 
     def CleanProject(self):
         for file in self.GetAllPathsToDelete():
