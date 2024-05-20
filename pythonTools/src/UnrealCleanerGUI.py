@@ -14,7 +14,7 @@ class UnrealCleanerGUI(QWidget):
 
         cleanStepsLayout= QHBoxLayout()
         self.masterLayout.addLayout(cleanStepsLayout)
-        self.analyzeBtn = QPushButton("Find")
+        self.analyzeBtn = QPushButton("Find Regeneratable Binaries")
         cleanStepsLayout.addWidget(self.analyzeBtn)
         self.analyzeBtn.clicked.connect(self.UpdateDeleteItems)
         self.cleanBtn = QPushButton("Clean")

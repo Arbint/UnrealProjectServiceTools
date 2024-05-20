@@ -36,11 +36,11 @@ class UnrealBase:
 
     def OpenEditor(self):
         command = f"{self.GetUnrealPrjFilePath()}"
-        CLIUtilities.RunCommand(command)
+        os.startfile(self.GetUnrealPrjFilePath())
 
     def OpenVisualStudioSolution(self):
         command = f"{self.GetVisualStudioSolutionFilePath()}"
-        CLIUtilities.RunCommand(command)
+        os.startfile(self.GetVisualStudioSolutionFilePath())
 
     def OpenUnrealProjectFolder(self):
         if self.unrealPrjDir and os.path.exists(self.unrealPrjDir):
@@ -48,8 +48,8 @@ class UnrealBase:
 
     def GetUnrealPrjFilePath(self):
         return dirUtilities.GetFilePathWithExtention(self.unrealPrjDir, '.uproject')
-
     def GetEngineSelectorCmd(self):
+
         return f"\"{self.GetEngineSelectorPath()}\""
 
     def GetVisualStudioSolutionFilePath(self):
