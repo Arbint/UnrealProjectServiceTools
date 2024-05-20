@@ -8,6 +8,11 @@ def AddDirToSys(pathToAdd):
 
 from PySide6.QtWidgets import QApplication,QLabel ,QVBoxLayout, QWidget, QMainWindow, QPushButton, QLineEdit, QFileDialog, QHBoxLayout
 from PySide6.QtGui import QIcon
+import pickle
+
+class SaveUnrealConfig:
+    def __init__(self, unrealDir):
+        self.unrealProjectDir = unrealDir 
 
 def main():
     toolPath = os.path.abspath(__file__)
@@ -20,9 +25,11 @@ def main():
     AddDirToSys(parentDir)
 
     from cleanup import UnrealCleanerGUI
+
     class Unreal:
         def __init__(self):
-            self.unrealPrjDir = self.AutoFindProject()
+            if not self.ReadConfig():
+                self.unrealPrjDir = self.AutoFindProject()
 
         def AutoFindProject(self):
             for file in os.listdir(parentDir):
@@ -30,6 +37,23 @@ def main():
                     return parentDir
 
             return ""
+
+        def ReadConfig(self):
+            if os.path.exists(self.GetConfigFilePath()):
+                with open(self.GetConfigFilePath(), 'rb') as file:
+                    loadedConfing = pickle.load(file)
+                    self.unrealPrjDir = loadedConfing.unrealProjectDir
+                    return True
+
+            return False
+
+        def SaveConfig(self):
+            config = SaveUnrealConfig(self.unrealPrjDir)
+            with open(self.GetConfigFilePath(), 'wb') as file:
+                pickle.dump(config, file) 
+
+        def GetConfigFilePath(self):
+            return os.path.join(toolDir, "config.uptl")
 
         def GetProjectDir(self):
             return self.unrealPrjDir
@@ -72,6 +96,9 @@ def main():
                 
         def SetupCleaner(self):
             self.centralLayout.addWidget(UnrealCleanerGUI(self.unreal.GetProjectDir))
+
+        def closeEvent(self, event):
+            self.unreal.SaveConfig();
 
     app = QApplication()
     mainWindow = MainWindow()
