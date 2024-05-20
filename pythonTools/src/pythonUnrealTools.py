@@ -35,6 +35,17 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.locationUnrealPrjBtn)
         self.locationUnrealPrjBtn.clicked.connect(self.LocateUnrealProject)
 
+        switchLayout = QHBoxLayout()
+        self.centralLayout.addLayout(switchLayout)
+        
+        self.engineVersionDisplay = QLabel()
+        switchLayout.addWidget(self.engineVersionDisplay)   
+        self.UpdateEngineVersionLabel()
+
+        switchEngineBtn = QPushButton("Switch Engine")
+        switchLayout.addWidget(switchEngineBtn)
+        switchEngineBtn.clicked.connect(self.SwithEngineVersion)
+
         openLayout = QHBoxLayout()
         self.centralLayout.addLayout(openLayout)
 
@@ -50,6 +61,13 @@ class MainWindow(QMainWindow):
         openLayout.addWidget(openSlnBtn)
         openSlnBtn.clicked.connect(self.unreal.OpenVisualStudioSolution)
 
+    def SwithEngineVersion(self):
+        self.unreal.SwitchEngineVersion()
+        self.UpdateEngineVersionLabel()
+
+    def UpdateEngineVersionLabel(self):
+        self.engineVersionDisplay.setText(f"Version: Unreal Engine {self.unreal.GetEngineVersion()}")
+
     def LocateUnrealProject(self):
         fileFilter = "Unreal Project File(*.uproject);;"
         unrealProj = QFileDialog().getOpenFileName(None, "Please Select The Unreal Project", self.unreal.unrealPrjDir, fileFilter)
@@ -62,7 +80,7 @@ class MainWindow(QMainWindow):
         self.centralLayout.addWidget(UnrealCleanerGUI(self.unreal))
 
     def closeEvent(self, event):
-        self.unreal.SaveConfig();
+        self.unreal.SaveConfig()
 
 def StartUnrealTools():
     app = QApplication()

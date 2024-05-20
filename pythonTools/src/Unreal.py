@@ -4,6 +4,7 @@ import os
 import dirUtilities
 import shutil
 import CLIUtilities
+import json
 
 class SaveUnrealConfig:
     def __init__(self, unrealDir):
@@ -34,6 +35,16 @@ class UnrealBase:
     def GetProjectDir(self):
         return self.unrealPrjDir
 
+    def SwitchEngineVersion(self):
+        #"C:\Program Files (x86)\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe" /switchversion "%1"
+        command = f"{self.GetEngineSelectorCmd()} /switchversion {self.GetUnrealPrjFilePath()}"
+        CLIUtilities.RunCommand(command)
+
+    def GetEngineVersion(self):
+        with open(self.GetUnrealPrjFilePath(), 'r') as file:
+            projectInfo = json.load(file)
+            return projectInfo['EngineAssociation']
+
     def OpenEditor(self):
         command = f"{self.GetUnrealPrjFilePath()}"
         os.startfile(self.GetUnrealPrjFilePath())
@@ -48,8 +59,8 @@ class UnrealBase:
 
     def GetUnrealPrjFilePath(self):
         return dirUtilities.GetFilePathWithExtention(self.unrealPrjDir, '.uproject')
-    def GetEngineSelectorCmd(self):
 
+    def GetEngineSelectorCmd(self):
         return f"\"{self.GetEngineSelectorPath()}\""
 
     def GetVisualStudioSolutionFilePath(self):
